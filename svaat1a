@@ -111,3 +111,59 @@ module testbench;
 endmodule
 
 
+//testbench2(random)
+
+module testbench;
+    // Declare inputs and outputs
+    reg [7:0] A, B, C, D, E, F, G, H;
+    wire [7:0] A_sorted, B_sorted, C_sorted, D_sorted, E_sorted, F_sorted, G_sorted, H_sorted;
+
+    // Instantiate the DUT
+    sorter dut (
+        .A(A), .B(B), .C(C), .D(D),
+        .E(E), .F(F), .G(G), .H(H),
+        .A_sorted(A_sorted), .B_sorted(B_sorted), .C_sorted(C_sorted), 
+        .D_sorted(D_sorted), .E_sorted(E_sorted), .F_sorted(F_sorted),
+        .G_sorted(G_sorted), .H_sorted(H_sorted)
+    );
+
+    initial begin
+        // Dump file setup for waveform
+        $dumpfile("dump.vcd");
+        $dumpvars(0, testbench);
+
+        // Random test cases
+        repeat (5) begin
+            randomize_inputs();
+            #1; // Wait for combinational logic to settle
+            display_results;
+        end
+
+        // Finish simulation
+        $finish;
+    end
+
+    // Task to randomize inputs
+    task randomize_inputs;
+        A = $random;
+        B = $random;
+        C = $random;
+        D = $random;
+        E = $random;
+        F = $random;
+        G = $random;
+        H = $random;
+    endtask
+
+    task display_results;
+        $display("Input: %h %h %h %h %h %h %h %h", A, B, C, D, E, F, G, H);
+        $display("Output: %h %h %h %h %h %h %h %h", A_sorted, B_sorted, C_sorted, D_sorted, E_sorted, F_sorted, G_sorted, H_sorted);
+
+        // Assertion for correctness
+        assert(A_sorted <= B_sorted && B_sorted <= C_sorted && C_sorted <= D_sorted &&
+               D_sorted <= E_sorted && E_sorted <= F_sorted && F_sorted <= G_sorted &&
+               G_sorted <= H_sorted) else $fatal("Sorting failed!");
+    endtask
+endmodule
+
+
